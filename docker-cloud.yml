@@ -1,0 +1,13 @@
+dontcrashmydrone-web:
+  restart: always
+  autoredeploy: true
+  image: ferumflex/dontcrashmydrone:latest
+  ports:
+    - 9100:80
+  environment:
+    - VIRTUAL_HOST=dontcrashmydrone.ferumflex.com
+    - VIRTUAL_PORT=9100
+    - MODULE=mydrone
+  volumes:
+    - /data/dontcrashmydrone/ommmm_media:/opt/django/persistent/media
+    - /data/dontcrashmydrone/data:/opt/django/app/data

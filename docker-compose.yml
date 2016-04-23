@@ -1,0 +1,19 @@
+version: '2'
+services:
+  dontcrashmydrone-web:
+    restart: always
+    build: .
+    command: python /opt/django/app/manage.py runserver 0.0.0.0:80
+    ports:
+      - 80
+    environment:
+      - MODULE=mydrone
+    volumes:
+      - dontcrashmydrone_media:/opt/django/persistent/media
+      - dontcrashmydrone_data:/opt/django/app/data
+
+volumes:
+  dontcrashmydrone_media:
+    external: false
+  dontcrashmydrone_data:
+    external: false
