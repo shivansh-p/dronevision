@@ -1,7 +1,6 @@
 dontcrashmydrone-web:
-  restart: always
-  autoredeploy: true
   image: ferumflex/dontcrashmydrone:latest
+  autodestroy: always
   ports:
     - 9100:80
   environment:
