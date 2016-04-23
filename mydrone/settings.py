@@ -127,3 +127,8 @@ STATIC_URL = '/static/'
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, '..', 'volatile', 'static')
+
+########################################################################################################################
+# Google maps
+########################################################################################################################
+MAPS_GOOGLE_KEY = 'AIzaSyD2OxjB-PO156SuOScDzIEv6UjFVtDYM6s'
