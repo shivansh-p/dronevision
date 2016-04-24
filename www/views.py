@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 # common
+import time
 import math
+import logging
+import hashlib
 
 # django
 from django.views.generic import TemplateView, View
@@ -9,6 +12,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.core.cache import cache
 
 # other
 import googlemaps
@@ -83,6 +87,7 @@ class UpadateTrackApiView(JSONView):
             'lat': lat,
             'lng': lng,
             'alt': alt,
+            'time': time.time(),
         }
 
         if not track.points:
@@ -90,22 +95,25 @@ class UpadateTrackApiView(JSONView):
         track.points.append(point)
         track.save()
 
-        latest_point = track.get_point(0)
+        latest_point, latest_time = track.get_point(0)
         prev_point = None
+        prev_time = None
         if latest_point:
             current_index = 1
             while True:
-                prev_point = track.get_point(current_index)
+                prev_point, prev_time = track.get_point(current_index)
                 if not prev_point:
                     break
 
-                if vincenty(prev_point, latest_point).miles > 0.01:
+                d = vincenty(prev_point, latest_point)
+                if d.meters > 0.01:
                     break
 
                 current_index += 1
 
-
         advices = []
+        speed = 0
+        angle = 0
         terrain = {
             'highest_point': None,
             'distance_to_highest_point': None,
@@ -117,13 +125,12 @@ class UpadateTrackApiView(JSONView):
 
             bearing = calculate_initial_compass_bearing(prev_point, latest_point)
 
-
             origin = geopy.Point(latest_point[0], latest_point[1])
             destination = VincentyDistance(meters=METERS_LOOK).destination(origin, bearing)
 
             point100 = destination.latitude, destination.longitude
 
-            rs = elevation.elevation_along_path(gmaps, [latest_point, point100], METERS_LOOK)
+            rs = get_elevation_path(gmaps, [latest_point, point100], METERS_LOOK)
 
             for i, r in enumerate(rs):
                 elev = r['elevation']
@@ -139,6 +146,13 @@ class UpadateTrackApiView(JSONView):
                     'type': 'critical',
                     'message': 'After %s metres you will strike terrain' % terrain['distance_to_highest_point'],
                 })
+
+            d = vincenty(latest_point, prev_point).meters
+            t = (latest_time - prev_time)
+            if t > 0:
+                speed = d / t
+
+            angle = bearing - 90
 
         search = {
             'query': {
@@ -161,7 +175,7 @@ class UpadateTrackApiView(JSONView):
         eresults = es.search(search, doc_type=settings.ELASTICSEARCH_DOC, index=settings.ELASTICSEARCH_INDEX)
         inserctions = eresults.get('hits', [])
 
-        rs = elevation.elevation(gmaps, latest_point)
+        rs = get_elevation(gmaps, latest_point)
         if rs:
             current_altitude = rs[0].get('elevation')
         else:
@@ -187,6 +201,8 @@ class UpadateTrackApiView(JSONView):
             'inserctions': inserctions,
             'altitude': current_altitude,
             'weather': weather,
+            'speed': speed,
+            'angle': angle,
         }
 
         return result
@@ -236,3 +252,37 @@ def calculate_initial_compass_bearing(pointA, pointB):
     compass_bearing = (initial_bearing + 360) % 360
 
     return compass_bearing
+
+
+def get_elevation(gmaps, point):
+    m = hashlib.md5()
+    m.update(str(point))
+    key = m.hexdigest()
+
+    c = cache.get(key)
+    if c:
+        logging.warning("Use cache")
+        return c
+    else:
+        r = elevation.elevation(gmaps, point)
+        cache.set(key, r)
+        return r
+
+
+def get_elevation_path(gmaps, points, METERS_LOOK):
+
+    m = hashlib.md5()
+    for p in points:
+        m.update(str(p))
+    m.update(str(METERS_LOOK))
+
+    key = m.hexdigest()
+
+    c = cache.get(key)
+    if c:
+        logging.warning("Use cache")
+        return c
+    else:
+        r = elevation.elevation_along_path(gmaps, points, METERS_LOOK)
+        cache.set(key, r)
+        return r

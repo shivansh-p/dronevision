@@ -71,12 +71,12 @@ class Track(BaseModel):
 
     def get_point(self, index):
         if not self.points:
-            return None
+            return None, None
 
         rpoints = list(reversed(self.points))
         if len(rpoints) > index:
             p = rpoints[index]
-            return (p['lat'], p['lng'])
+            return (p['lat'], p['lng']), p['time']
         else:
-            return None
+            return None, None
 

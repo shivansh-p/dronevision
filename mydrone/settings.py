@@ -179,3 +179,11 @@ if SERVER == 'prod':
     RAVEN_CONFIG = {
         'dsn': 'https://772ec8274e904d1b9c139bbb00a8b599:33bf7d9de814430390bfca804e9435f4@sentry.ferumflex.com/5',
     }
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
