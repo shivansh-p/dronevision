@@ -132,3 +132,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, '..', 'volatile', 'static')
 # Google maps
 ########################################################################################################################
 MAPS_GOOGLE_KEY = 'AIzaSyD2OxjB-PO156SuOScDzIEv6UjFVtDYM6s'
+
+
+ELASTICSEARCH_HOST = 'http://localhost:9200/'
+ELASTICSEARCH_INDEX = 'library'
+ELASTICSEARCH_DOC = 'zones'

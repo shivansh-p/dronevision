@@ -13,6 +13,7 @@ from django.conf import settings
 # other
 import googlemaps
 from googlemaps import elevation
+from pyelasticsearch import ElasticSearch
 
 from geopy.distance import VincentyDistance, vincenty
 import geopy
@@ -54,6 +55,12 @@ class HomeView(TemplateView):
 class MapView(TemplateView):
     template_name = "map.html"
 
+    def get_context_data(self, **kwargs):
+        es = ElasticSearch(settings.ELASTICSEARCH_HOST)
+        return {
+            'query': es.search()
+        }
+
 
 class CreateTrackApiView(JSONView):
     def get_data(self, **response_kwargs):
@@ -69,6 +76,7 @@ class UpadateTrackApiView(JSONView):
         long = float(self.REQUEST.get('long'))
         alt = float(self.REQUEST.get('alt'))
         METERS_LOOK = int(self.REQUEST.get('look_ahead', 100))
+        RADIUS = float(self.REQUEST.get('radius', 8000))
         assert lat and long and alt
 
         point = {
@@ -81,8 +89,6 @@ class UpadateTrackApiView(JSONView):
             track.points = []
         track.points.append(point)
         track.save()
-
-        gmaps = googlemaps.Client(key=settings.MAPS_GOOGLE_KEY)
 
         latest_point = track.get_point(0)
         prev_point = None
@@ -104,6 +110,7 @@ class UpadateTrackApiView(JSONView):
             'highest_point': None,
             'distance_to_highest_point': None,
         }
+        gmaps = googlemaps.Client(key=settings.MAPS_GOOGLE_KEY)
         if latest_point and prev_point:
             terrain['highest_point'] = 0
             terrain['distance_to_highest_point'] = 0
@@ -133,12 +140,41 @@ class UpadateTrackApiView(JSONView):
                     'message': 'After %s metres you will strike terrain' % terrain['distance_to_highest_point'],
                 })
 
+        search = {
+            'query': {
+                'geo_shape': {
+                    "location": {
+                        "relation": "intersects",
+                        "shape": {
+                            "type": "circle",
+                            "radius": "%sm" % RADIUS,
+                            "coordinates": [
+                                latest_point[1], latest_point[0],
+                            ],
+                        }
+                    }
+                }
+            }
+        }
+
+        es = ElasticSearch(settings.ELASTICSEARCH_HOST)
+        eresults = es.search(search, doc_type=settings.ELASTICSEARCH_DOC, index=settings.ELASTICSEARCH_INDEX)
+        inserctions = eresults.get('hits', [])
+
+        rs = elevation.elevation(gmaps, latest_point)
+        if rs:
+            current_altitude = rs[0].get('elevation')
+        else:
+            current_altitude = None
+            
         result = {
             'id': track.id,
             'terrain': terrain,
             'advices': advices,
             'latest_point': latest_point,
             'prev_point': prev_point,
+            'inserctions': inserctions,
+            'altitude': current_altitude,
         }
 
         return result
