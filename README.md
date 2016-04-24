@@ -8,4 +8,5 @@ Our API allows:
 * Show precise info about current weather conditions (temperature and pressure depends on altitude) and warn about possible problems.
 * Warn about no flight zones.
 * Show flight speed and direction.
-* Check out Drone Vision App or documentation.
+
+Check out [Drone Vision App](http://dontcrashmydrone.ferumflex.com) or [documentation](http://dronevision.api-docs.io).
