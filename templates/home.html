@@ -23,18 +23,18 @@
       </div>
       <div class="form-group">
         <label for="lat">Latitude:</label>
-        <input class="form-control" type="text" id="lat" value="44.747"
+        <input class="form-control" type="text" id="lat" value="36.29675984238573"
                required>
       </div>
       <div class="form-group">
         <label for="lng">Longitude:</label>
-        <input class="form-control" type="text" id="lng" value="-109.231"
+        <input class="form-control" type="text" id="lng" value="-117.5472296829058"
                required>
       </div>
       <div class="form-group">
         <label for="alt">Altitude:</label>
         <div class="input-group">
-          <input class="form-control" type="text" id="alt" value="0">
+          <input class="form-control" type="text" id="alt" value="100" required>
           <span class="input-group-addon">m</span>
         </div>
       </div>
@@ -60,14 +60,13 @@
           <tbody>
             <tr>
               <td>Speed</td>
-              <td>60 km/h</td>
+              <td class="info--general-speed"></td>
             </tr>
             <tr>
               <td>Direction</td>
               <td>
-                65&deg;
-                <span class="compass"
-                      style="transform: rotate(65deg)">&uarr;</span>
+                <span class="info--general-dir" style="display: none;"></span>
+                <span class="info--general-dir-comp compass" style="display: none;">&uarr;</span>
               </td>
             </tr>
           </tbody>
@@ -82,11 +81,11 @@
           <tbody>
           <tr>
             <td>Highest Terrain Point</td>
-            <td>1532 m</td>
+            <td class="info--terrain-highest-point"></td>
           </tr>
-          <tr class="success">
+          <tr>
             <td>No Flight Zone</td>
-            <td>NO</td>
+            <td class="info--terrain-no-flight-zone"></td>
           </tr>
           </tbody>
         </table>
@@ -98,28 +97,21 @@
         </div>
         <table class="table table-bordered">
           <tbody>
-          <tr class="success">
+          <tr>
             <td>Temperature</td>
-            <td>+20&deg; C</td>
+            <td><span class="info--weather-temperature"></span>&deg; C</td>
           </tr>
-          <tr class="success">
+          <tr>
             <td>Wind</td>
             <td>
-              20 m/s, 20&deg;<span class="compass"
-                           style="transform: rotate(20deg)">&uarr;</span>
+              <span class="info--weather-wind-speed"></span>
+              <span class="info--weather-wind-dir" style="display: none;"></span>
+              <span class="info--weather-wind-dir-comp compass" style="display: none;">&uarr;</span>
             </td>
           </tr>
-          <tr class="danger">
+          <tr>
             <td>Humidity</td>
-            <td>100%</td>
-          </tr>
-          <tr class="warning">
-            <td>Precipitation</td>
-            <td>Rain</td>
-          </tr>
-          <tr class="success">
-            <td>Pressure</td>
-            <td>1 atm</td>
+            <td class="info--weather-humidity"></td>
           </tr>
           </tbody>
         </table>
@@ -127,6 +119,9 @@
     </div>
   </div>
   <div id="map"></div>
+
+  <div class="alert alert-danger no-flights" role="alert"> <strong>Warning!</strong> You have entered no flight zone.</div>
+  <div class="alert alert-danger hit-terrain" role="alert"> <strong>Warning!</strong> After 1 meter you will strike terrain.</div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

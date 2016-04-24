@@ -33,7 +33,7 @@ form {
 }
 
 #info {
-
+  display: none;
 }
 
 .compass {
@@ -47,4 +47,17 @@ form {
   margin-left: 5px;
   vertical-align: middle;
   font-size: 10px;
+}
+
+.alert-danger {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  display: none;
+  font-size: 16px;
+  border-color: #f70028;
+  color: #f70028;
+
+  transition: all .2s ease-in-out;
+transform: scale(1.1);
 }

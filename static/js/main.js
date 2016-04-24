@@ -1,5 +1,5 @@
 $(function() {
-  var map, marker, radius;
+  var map, marker, radius, stepInterval, trackId;
 
   function initMap() {
     var currentParams = getCurrentParams();
@@ -58,16 +58,6 @@ $(function() {
     marker = undefined;
   }
 
-  $('#radius').on('input', function() {
-    setParams(getCurrentParams());
-  });
-
-  $('#lat, #lng').on('change', function() {
-    var currentParams = getCurrentParams();
-
-    moveTo(currentParams.lat, currentParams.lng);
-  });
-
   function setParams(params) {
     for (var field in params) {
       $('#' + field).val(params[field]);
@@ -87,7 +77,8 @@ $(function() {
       radius: $('#radius').val(),
       alt: $('#alt').val(),
       lat: $('#lat').val(),
-      lng: $('#lng').val()
+      lng: $('#lng').val(),
+      look_ahead: $('#look_ahead').val()
     };
 
     for (var field in params) {
@@ -108,10 +99,111 @@ $(function() {
     map.panTo(location);
   }
 
+  function track(params) {
+    if (!trackId) {
+      $.ajax({
+        url: 'http://dontcrashmydrone.ferumflex.com/api/track',
+        method: 'POST',
+        dataType: 'json'
+      }).done(function(response) {
+        trackId = response.id;
+        track(params);
+      });
+    } else {
+      $.ajax({
+        url: 'http://dontcrashmydrone.ferumflex.com/api/track/' + trackId,
+        method: 'POST',
+        dataType: 'json',
+        data: params
+      }).done(function(response) {
+        if (response) {
+          $('#info').show();
+        }
+
+        if (response.advices.length) {
+          $('.hit-terrain').fadeIn(300);
+        } else {
+          $('.hit-terrain').hide();
+        }
+
+        if (response.speed) {
+          $('.info--general-speed').text(Math.round((response.speed * 3.6)) + ' km/h');
+        }
+
+        if (response.angle) {
+          var deg = response.angle.toFixed(0);
+          $('.info--general-dir').text(deg + '°').show();
+          $('.info--general-dir-comp').css({
+            transform: 'rotate(' + deg + 'deg)'
+          }).show();
+        } else {
+          $('.info--general-dir').hide();
+          $('.info--general-dir-comp').hide();
+        }
+
+        if (response.terrain.highest_point) {
+          $('.info--terrain-highest-point').text(response.terrain.highest_point.toFixed(2));
+        }
+
+        if (response.inserctions.total) {
+          $('.info--terrain-no-flight-zone').text('YES').closest('tr').removeClass('success').addClass('danger');
+          $('.no-flights').fadeIn(300);
+        } else {
+          $('.info--terrain-no-flight-zone').text('NO').closest('tr').removeClass('danger').addClass('success');
+          $('.no-flights').hide();
+        }
+
+        if (response.weather.humidity) {
+          $('.info--weather-humidity').text(response.weather.humidity + '%');
+
+          if (response.weather.humidity > 80) {
+            $('.info--weather-humidity').closest('tr').removeClass('success').addClass('warning');
+          } else {
+            $('.info--weather-humidity').closest('tr').removeClass('warning').addClass('success');
+          }
+        }
+
+        if (response.weather.wind) {
+          $('.info--weather-wind-speed').text(response.weather.wind.speed + 'm/s');
+
+          if (response.weather.wind.speed > 10) {
+            $('.info--weather-wind-speed').closest('tr').removeClass('success').addClass('danger');
+          } else {
+            $('.info--weather-wind-speed').closest('tr').removeClass('danger').addClass('success');
+          }
+
+          if (response.weather.wind.deg) {
+            var deg = response.weather.wind.deg.toFixed(0);
+            $('.info--weather-wind-dir').text(',' + deg + '°').show();
+            $('.info--weather-wind-dir-comp').css({
+              transform: 'rotate(' + deg + 'deg)'
+            }).show();
+          } else {
+            $('.info--weather-wind-dir').hide();
+            $('.info--weather-wind-dir-comp').hide();
+          }
+        }
+
+        if (response.weather.temprature) {
+          $('.info--weather-temperature').text(response.weather.temprature.temp);
+        }
+      });
+    }
+  }
+
   initMap();
   setParams(getCurrentParams());
 
-  var stepInterval;
+  $('#radius').on('input', function() {
+    setParams(getCurrentParams());
+  });
+
+  $('#lat, #lng').on('change', function() {
+    var currentParams = getCurrentParams();
+
+    moveTo(currentParams.lat, currentParams.lng);
+  });
+
   $('#drone-emulation').on('click', function(e) {
     e.preventDefault();
     clearInterval(stepInterval);
@@ -143,24 +235,4 @@ $(function() {
     e.preventDefault();
     track(getCurrentParams());
   });
-
-  var trackId;
-  function track(params) {
-    if (!trackId) {
-      $.ajax({
-        url: '/api/track',
-        method: 'POST',
-        dataType: 'json'
-      }).done(function (response) {
-        trackId = response.id;
-      });
-    } else {
-       $.ajax({
-        url: '/api/track/' + trackId,
-        method: 'POST',
-        dataType: 'json',
-        data: params
-      });
-    }
-  }
 });

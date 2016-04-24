@@ -152,7 +152,7 @@ class UpadateTrackApiView(JSONView):
             if t > 0:
                 speed = d / t
 
-            angle = bearing - 90
+            angle = bearing
 
         search = {
             'query': {
