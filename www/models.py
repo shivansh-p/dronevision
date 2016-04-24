@@ -16,9 +16,9 @@ from django.utils import timezone
 ###############################################################################
 class BaseModel(models.Model):
     add_date = models.DateTimeField(verbose_name="Add date", editable=False,
-                                    db_index=True, default=timezone.now())
+                                    db_index=True, default=timezone.now)
     update_date = models.DateTimeField(verbose_name="Update date",
-                                       editable=False, default=timezone.now())
+                                       editable=False, default=timezone.now)
 
     class Meta(object):
         abstract = True

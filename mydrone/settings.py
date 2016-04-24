@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'raven.contrib.django.raven_compat',
     'www',
 ]
 
@@ -160,7 +159,8 @@ STATICFILES_FINDERS = (
 ########################################################################################################################
 # Google maps
 ########################################################################################################################
-MAPS_GOOGLE_KEY = 'AIzaSyD2OxjB-PO156SuOScDzIEv6UjFVtDYM6s'
+#MAPS_GOOGLE_KEY = 'AIzaSyD2OxjB-PO156SuOScDzIEv6UjFVtDYM6s'
+MAPS_GOOGLE_KEY = 'AIzaSyDd6UfJfDtdS_xTtzMMfNM-DuIqgNEy6Hk'
 
 
 ELASTICSEARCH_HOST = 'http://elasticsearch:9200/'
@@ -174,6 +174,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 ########################################################################################################################
 # Raven
 ########################################################################################################################
-RAVEN_CONFIG = {
-    'dsn': 'https://772ec8274e904d1b9c139bbb00a8b599:33bf7d9de814430390bfca804e9435f4@sentry.ferumflex.com/5',
-}
+if SERVER == 'prod':
+    INSTALLED_APPS += ('raven.contrib.django.raven_compat', )
+    RAVEN_CONFIG = {
+        'dsn': 'https://772ec8274e904d1b9c139bbb00a8b599:33bf7d9de814430390bfca804e9435f4@sentry.ferumflex.com/5',
+    }
