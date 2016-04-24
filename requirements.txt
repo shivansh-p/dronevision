@@ -4,3 +4,4 @@ googlemaps==2.4.3
 geopy==1.9.1
 pyshp=1.2.3
 pyelasticsearch==1.4.0
+django-cors-headers==1.1.0

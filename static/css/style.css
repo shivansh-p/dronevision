@@ -1,0 +1,50 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+.app {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
+#map {
+  position: absolute;
+  height: 100%;
+  width: 80%;
+  right: 0;
+  top: 0;
+}
+
+#controls {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 20%;
+  padding: 15px;
+  overflow: auto;
+}
+
+#info {
+
+}
+
+.compass {
+  display: inline-block;
+  border-radius: 50% 50%;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+  background: #000;
+  color: #fff;
+  margin-left: 5px;
+  vertical-align: middle;
+  font-size: 10px;
+}

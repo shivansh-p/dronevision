@@ -73,15 +73,15 @@ class UpadateTrackApiView(JSONView):
     def get_data(self, track_id):
         track = get_object_or_404(Track, id=track_id)
         lat = float(self.REQUEST.get('lat'))
-        long = float(self.REQUEST.get('long'))
+        lng = float(self.REQUEST.get('lng'))
         alt = float(self.REQUEST.get('alt'))
         METERS_LOOK = int(self.REQUEST.get('look_ahead', 100))
         RADIUS = float(self.REQUEST.get('radius', 8000))
-        assert lat and long and alt
+        assert lat and lng and alt
 
         point = {
             'lat': lat,
-            'lng': long,
+            'lng': lng,
             'alt': alt,
         }
 
@@ -166,7 +166,7 @@ class UpadateTrackApiView(JSONView):
             current_altitude = rs[0].get('elevation')
         else:
             current_altitude = None
-            
+
         result = {
             'id': track.id,
             'terrain': terrain,

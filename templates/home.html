@@ -1,11 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Donocrashmydrone</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Don't Crash My Drone by Team 16</title>
+  <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Do not crash my drone</h1>
 
+<div class="app">
+  <div id="controls">
+    <form>
+      <div class="form-group">
+        <label for="radius">Radius:</label>
+        <input type="range" id="radius" min="500" step="100" max="20000"
+               value="1000">
+              <span class="text-muted">
+                <span id="current-radius"></span> m
+              </span>
+      </div>
+      <div class="form-group">
+        <label for="lat">Latitude:</label>
+        <input class="form-control" type="text" id="lat" value="44.747"
+               required>
+      </div>
+      <div class="form-group">
+        <label for="lng">Longitude:</label>
+        <input class="form-control" type="text" id="lng" value="-109.231"
+               required>
+      </div>
+      <div class="form-group">
+        <label for="alt">Altitude:</label>
+        <div class="input-group">
+          <input class="form-control" type="text" id="alt" value="0">
+          <span class="input-group-addon">m</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="look_ahead">Look ahead:</label>
+        <div class="input-group">
+          <input class="form-control" type="text" id="look_ahead"
+                 value="100">
+          <span class="input-group-addon">m</span>
+        </div>
+      </div>
+      <button id="get-info" class="btn btn-primary">Get info</button>
+      <button id="drone-emulation" class="btn btn-link">Drone emulation
+      </button>
+    </form>
+
+    <div id="info">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">General</h3>
+        </div>
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Speed</td>
+              <td>60 km/h</td>
+            </tr>
+            <tr>
+              <td>Direction</td>
+              <td>
+                65&deg;
+                <span class="compass"
+                      style="transform: rotate(65deg)">&uarr;</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Terrain</h3>
+        </div>
+        <table class="table">
+          <tbody>
+          <tr>
+            <td>Highest Terrain Point</td>
+            <td>1532 m</td>
+          </tr>
+          <tr class="success">
+            <td>No Flight Zone</td>
+            <td>NO</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Weather</h3>
+        </div>
+        <table class="table table-bordered">
+          <tbody>
+          <tr class="success">
+            <td>Temperature</td>
+            <td>+20&deg; C</td>
+          </tr>
+          <tr class="success">
+            <td>Wind</td>
+            <td>
+              20 m/s, 20&deg;<span class="compass"
+                           style="transform: rotate(20deg)">&uarr;</span>
+            </td>
+          </tr>
+          <tr class="danger">
+            <td>Humidity</td>
+            <td>100%</td>
+          </tr>
+          <tr class="warning">
+            <td>Precipitation</td>
+            <td>Rain</td>
+          </tr>
+          <tr class="success">
+            <td>Pressure</td>
+            <td>1 atm</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div id="map"></div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2OxjB-PO156SuOScDzIEv6UjFVtDYM6s"></script>
+<script src="/static/js/test-data.js"></script>
+<script src="/static/js/main.js"></script>
 </body>
-</html>

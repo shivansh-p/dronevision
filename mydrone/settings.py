@@ -37,12 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'www',
 ]
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -128,6 +130,22 @@ STATIC_URL = '/static/'
 # Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, '..', 'volatile', 'static')
 
+# Additional locations of static files
+STATICFILES_DIRS = (
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    os.path.join(BASE_DIR, 'static'),
+)
+
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+)
+
 ########################################################################################################################
 # Google maps
 ########################################################################################################################
@@ -137,3 +155,6 @@ MAPS_GOOGLE_KEY = 'AIzaSyD2OxjB-PO156SuOScDzIEv6UjFVtDYM6s'
 ELASTICSEARCH_HOST = 'http://localhost:9200/'
 ELASTICSEARCH_INDEX = 'library'
 ELASTICSEARCH_DOC = 'zones'
+
+
+CORS_ORIGIN_ALLOW_ALL = True
