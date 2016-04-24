@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 
+SERVER = os.environ.get('DONTCRASHMYDRONE_SERVER')
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -23,9 +25,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'd2gii=@egqblsk$^^2_vopglaxh$!r*i9k2o^hdr=9#ctf8$s3'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(SERVER not in ("prod", "testing"))
 
-ALLOWED_HOSTS = []
+
+if SERVER == "prod":
+    ALLOWED_HOSTS = [
+        'dontcrashmydrone.ferumflex.com',
+    ]
+else:
+    ALLOWED_HOSTS = [
+        '*',
+    ]
 
 
 # Application definition
@@ -38,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'raven.contrib.django.raven_compat',
     'www',
 ]
 
@@ -152,9 +163,17 @@ STATICFILES_FINDERS = (
 MAPS_GOOGLE_KEY = 'AIzaSyD2OxjB-PO156SuOScDzIEv6UjFVtDYM6s'
 
 
-ELASTICSEARCH_HOST = 'http://localhost:9200/'
+ELASTICSEARCH_HOST = 'http://elasticsearch:9200/'
 ELASTICSEARCH_INDEX = 'library'
 ELASTICSEARCH_DOC = 'zones'
 
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+
+########################################################################################################################
+# Raven
+########################################################################################################################
+RAVEN_CONFIG = {
+    'dsn': 'https://772ec8274e904d1b9c139bbb00a8b599:33bf7d9de814430390bfca804e9435f4@sentry.ferumflex.com/5',
+}

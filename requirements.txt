@@ -2,6 +2,9 @@ Django==1.9.4
 jsonfield==1.0.3
 googlemaps==2.4.3
 geopy==1.9.1
-pyshp=1.2.3
+pyshp==1.2.3
 pyelasticsearch==1.4.0
+elasticsearch==2.3.0
 django-cors-headers==1.1.0
+raven==5.13.0
+pyowm==2.3.1

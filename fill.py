@@ -1,9 +1,6 @@
 # common
 import logging
 
-# django
-from django.conf import settings
-
 # other
 import shapefile
 from pyelasticsearch import ElasticSearch, ElasticHttpError
@@ -13,72 +10,70 @@ logging.getLogger('elasticsearch.trace').setLevel(logging.INFO)
 logging.getLogger('elasticsearch').setLevel(logging.INFO)
 
 
-INIT = False
-es = ElasticSearch(settings.ELASTICSEARCH_HOST, timeout=120)
+ELASTICSEARCH_HOST = 'http://elasticsearch:9200/'
+ELASTICSEARCH_INDEX = 'library'
+ELASTICSEARCH_DOC = 'zones'
 
 
-if INIT:
-    FILES = [
-        "nofly/shapefile/us_national_parks",
-        "nofly/shapefile/us_military",
-        "nofly/shapefile/5_mile_airport",
-    ]
+es = ElasticSearch(ELASTICSEARCH_HOST, timeout=120)
 
-    c = (34.0572105135103, -118.70590209960938)
 
-    try:
-        es.delete_all(settings.ELASTICSEARCH_DOC, settings.ELASTICSEARCH_INDEX)
-    except ElasticHttpError:
-        pass
+FILES = [
+    "nofly/shapefile/us_national_parks",
+    "nofly/shapefile/us_military",
+    "nofly/shapefile/5_mile_airport",
+]
 
-    try:
-        es.delete_index(settings.ELASTICSEARCH_INDEX)
-    except ElasticHttpError:
-        pass
+try:
+    es.delete_all(ELASTICSEARCH_DOC, ELASTICSEARCH_INDEX)
+except ElasticHttpError:
+    pass
 
-    settings = {
-        "number_of_shards": 3,
-        "number_of_replicas": 1,
-        "mappings": {
-            settings.ELASTICSEARCH_DOC: {
-                "properties": {
-                    "location": {
-                        "type": "geo_shape",
-                        "tree": "quadtree",
-                        "precision": "1m"
-                    }
-                }
-            },
-        }
-    }
-    es.create_index(settings.ELASTICSEARCH_INDEX, settings=settings)
+try:
+    es.delete_index(ELASTICSEARCH_INDEX)
+except ElasticHttpError:
+    pass
 
-    for filename in FILES:
-        print "Processing %s" % filename
-
-        sf = shapefile.Reader(filename)
-
-        shapes = sf.shapes()
-        indexes = []
-        for i, shape in enumerate(shapes, start=1):
-            points = [(p[0], p[1]) for p in shape.points]
-
-            data = {
-                'filename': filename,
-                'location': {
-                    'type': 'polygon',
-                    'coordinates': [points]
+index_settings = {
+    "number_of_shards": 3,
+    "number_of_replicas": 1,
+    "mappings": {
+        ELASTICSEARCH_DOC: {
+            "properties": {
+                "location": {
+                    "type": "geo_shape",
+                    "tree": "quadtree",
+                    "precision": "1m"
                 }
             }
-            #indexes.append(es.index_op(data))
+        },
+    }
+}
+es.create_index(ELASTICSEARCH_INDEX, settings=index_settings)
 
-            #for chunk in chunker(indexes, 10):
-            if points[-1] != points[0]:
-                points.append(points[0])
+for filename in FILES:
+    print "Processing %s" % filename
 
-            try:
-                es.bulk([es.index_op(data)],
-                        doc_type=settings.ELASTICSEARCH_DOC,
-                        index=settings.ELASTICSEARCH_INDEX)
-            except:
-                print "Exception"
+    sf = shapefile.Reader(filename)
+
+    shapes = sf.shapes()
+    for i, shape in enumerate(shapes, start=1):
+        points = [(p[0], p[1]) for p in shape.points]
+
+        data = {
+            'filename': filename,
+            'location': {
+                'type': 'polygon',
+                'coordinates': [points]
+            }
+        }
+
+        if points[-1] != points[0]:
+            points.append(points[0])
+
+        try:
+            es.bulk([es.index_op(data)],
+                    doc_type=ELASTICSEARCH_DOC,
+                    index=ELASTICSEARCH_INDEX)
+        except:
+            print "Exception"

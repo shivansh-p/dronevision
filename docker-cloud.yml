@@ -1,11 +1,11 @@
 dontcrashmydrone-web:
   image: ferumflex/dontcrashmydrone:latest
-  autodestroy: always
   ports:
     - 9100:80
   environment:
     - VIRTUAL_HOST=dontcrashmydrone.ferumflex.com
     - VIRTUAL_PORT=9100
+    - DONTCRASHMYDRONE_SERVER=prod
     - MODULE=mydrone
   volumes:
     - /data/dontcrashmydrone/ommmm_media:/opt/django/persistent/media

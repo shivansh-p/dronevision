@@ -167,6 +167,17 @@ class UpadateTrackApiView(JSONView):
         else:
             current_altitude = None
 
+        import pyowm
+        owm = pyowm.OWM('b1d3074b48c0a002a27a38ab6bf030e4')
+        # Search for current weather in London (UK)
+        observation = owm.weather_at_coords(latest_point[0], latest_point[1])
+        w = observation.get_weather()
+        weather = {
+            'wind': w.get_wind(),  # {'speed': 4.6, 'deg': 330}
+            'humidity': w.get_humidity(), # 87
+            'temprature': w.get_temperature('celsius'),  # {'temp_max': 10.5, 'temp': 9.7, 'temp_min': 9.0}
+        }
+
         result = {
             'id': track.id,
             'terrain': terrain,
@@ -175,6 +186,7 @@ class UpadateTrackApiView(JSONView):
             'prev_point': prev_point,
             'inserctions': inserctions,
             'altitude': current_altitude,
+            'weather': weather,
         }
 
         return result

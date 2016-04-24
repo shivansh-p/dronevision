@@ -11,9 +11,22 @@ services:
     volumes:
       - dontcrashmydrone_media:/opt/django/persistent/media
       - dontcrashmydrone_data:/opt/django/app/data
+    links:
+      - dontcrashmydrone-elasticsearch:dontcrashmydrone-elasticsearch
+    depends_on:
+      - dontcrashmydrone-elasticsearch
+
+  dontcrashmydrone-elasticsearch:
+    restart: always
+    image: elasticsearch
+    mem_limit: 1024m
+    volumes:
+      - dontcrashmydrone_elasticsearch_data:/usr/share/elasticsearch/data
 
 volumes:
   dontcrashmydrone_media:
     external: false
   dontcrashmydrone_data:
+    external: false
+  dontcrashmydrone_elasticsearch_data:
     external: false
